@@ -42,15 +42,15 @@ const isClaimIncluded = (
 
 export type RequiredScopes<R = ClaimChecker> = (scopes: string | string[]) => R;
 
-export const requiredScopes: RequiredScopes = (scopes) => {
+export const requiredScopes: RequiredScopes = (scopes, { customScopeKey="scope" } = {customScopeKey: "scope"}) => {
   if (typeof scopes === 'string') {
     scopes = scopes.split(' ');
   } else if (!Array.isArray(scopes)) {
     throw new TypeError("'scopes' must be a string or array of strings");
   }
-  const fn = isClaimIncluded('scope', scopes);
+  const fn = isClaimIncluded(customScopeKey, scopes);
   return claimCheck((payload) => {
-    if (!('scope' in payload)) {
+    if (!(customScopeKey in payload)) {
       throw new InsufficientScopeError(
         scopes as string[],
         "Missing 'scope' claim"
